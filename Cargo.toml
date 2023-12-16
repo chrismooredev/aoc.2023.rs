@@ -1,0 +1,6 @@
+
+[workspace]
+members = ["day01"]
+
+[workspace.metadata.aoch]
+year = 2023

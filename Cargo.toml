@@ -1,6 +1,7 @@
 
 [workspace]
-members = ["day01"]
+resolver = "2"
+members = ["day01", "day02"]
 
 [workspace.metadata.aoch]
 year = 2023

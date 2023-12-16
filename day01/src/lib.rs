@@ -70,9 +70,10 @@ impl AoCDay for Day01 {
 	}
 	fn part1(&self, data: &mut Self::Data<'_>) -> Self::Answer {
 		data.iter()
-			.map(|s| {
+			.enumerate()
+			.map(|(_si, s)| {
 				let (f, l) = Day01::find_numeric_digits(s).unwrap();
-				// eprintln!("{}: {:?} -> {:?}", si, s, (f, l));
+				// eprintln!("{}: {:?} -> {:?}", _si, s, (f, l));
 				(f*10 + l) as usize
 			})
 			.sum()
@@ -80,9 +81,9 @@ impl AoCDay for Day01 {
 	fn part2(&self, data: &mut Self::Data<'_>) -> Self::Answer {
 		data.iter()
 			.enumerate()
-			.map(|(si, s)| {
+			.map(|(_si, s)| {
 				let (f, l) = Day01::find_english_digits(s).unwrap();
-				// eprintln!("{}: {:?} -> {:?}", si, s, (f, l));
+				// eprintln!("{}: {:?} -> {:?}", _si, s, (f, l));
 				(f*10 + l) as usize
 			})
 			.sum()

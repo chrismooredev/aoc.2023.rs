@@ -419,9 +419,18 @@ name = "day01"
 version = "0.1.0"
 dependencies = [
  "aoch",
- "itertools",
+ "itertools 0.12.0",
  "lazy_static 1.4.0",
  "regex",
+ "thiserror",
+]
+
+[[package]]
+name = "day02"
+version = "0.1.0"
+dependencies = [
+ "aoch",
+ "itertools 0.10.5",
  "thiserror",
 ]
 
@@ -859,6 +868,15 @@ name = "ipnet"
 version = "2.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8f518f335dce6725a761382244631d86cf0ccb2863413590b31338feb467f9c3"
+
+[[package]]
+name = "itertools"
+version = "0.10.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b0fd2260e829bddf4cb6ea802289de2f86d6a7a690192fbe91b3f46e0f2c8473"
+dependencies = [
+ "either",
+]
 
 [[package]]
 name = "itertools"

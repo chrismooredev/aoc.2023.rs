@@ -1,7 +1,7 @@
 
 [workspace]
 resolver = "2"
-members = ["day01", "day02", "day03", "day04", "day05"]
+members = ["day01", "day02", "day03", "day04", "day05", "day06", "day07"]
 
 [build]
 rustflags = ["-C", "target-cpu=native"]
@@ -10,4 +10,4 @@ rustflags = ["-C", "target-cpu=native"]
 year = 2023
 
 [patch."https://github.com/chrismooredev/aochelper"]
-aoch = { path = "C:/Users/cmoore79/Documents/projects/aochelper" }
+aoch = { path = "../aochelper" }

@@ -100,7 +100,7 @@ dependencies = [
 
 [[package]]
 name = "aoch"
-version = "1.3.0"
+version = "1.3.1"
 dependencies = [
  "aoch-proc",
  "cargo-edit",
@@ -128,6 +128,12 @@ name = "arrayvec"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
+
+[[package]]
+name = "arrayvec"
+version = "0.7.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96d30a06541fbafbc7f82ed10c06164cfbd2c401138f6addd8404629c4b16711"
 
 [[package]]
 name = "atty"
@@ -458,6 +464,31 @@ dependencies = [
  "aoch",
  "itertools 0.10.5",
  "log",
+ "test-log",
+ "thiserror",
+]
+
+[[package]]
+name = "day06"
+version = "0.1.0"
+dependencies = [
+ "aoch",
+ "itertools 0.10.5",
+ "log",
+ "test-log",
+ "thiserror",
+]
+
+[[package]]
+name = "day07"
+version = "0.1.0"
+dependencies = [
+ "aoch",
+ "arrayvec 0.7.4",
+ "itertools 0.10.5",
+ "log",
+ "num-derive",
+ "num-traits 0.2.17",
  "test-log",
  "thiserror",
 ]
@@ -966,7 +997,7 @@ version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6607c62aa161d23d17a9072cc5da0be67cdfc89d3afb1e8d9c842bebc2525ffe"
 dependencies = [
- "arrayvec",
+ "arrayvec 0.5.2",
  "bitflags 1.3.2",
  "cfg-if",
  "ryu",
@@ -1113,6 +1144,17 @@ dependencies = [
  "lexical-core",
  "memchr",
  "version_check",
+]
+
+[[package]]
+name = "num-derive"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cfb77679af88f8b125209d354a202862602672222e7f2313fdd6dc349bad4712"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.41",
 ]
 
 [[package]]

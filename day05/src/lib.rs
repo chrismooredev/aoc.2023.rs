@@ -325,7 +325,7 @@ fn mapped_ranges() {
 	macro_rules! check_ranges {
 		($mapping:expr, $src:expr, $msg:literal, (), &[ $(($o:literal, $s:literal .. $e:literal),)* ]) => {
 			assert_matches!(
-				$mapping.map_range($src)
+				$mapping.search_segments($src)
 					.enumerate()
 					.inspect(|(i, r)| eprintln!("[{} / {:?}][{}] = {:?}", $msg, $src, i, r))
 					.map(|(_, r)| r)

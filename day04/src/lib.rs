@@ -20,7 +20,7 @@ fn iter_set_bits(num: u128) -> impl Iterator<Item = usize> {
 fn collect_into_bitset(s: &str) -> Result<u128, std::num::ParseIntError> {
 	s.split(' ')
 		.map(|s| s.trim())
-		.filter(|s| s.len() > 0)
+		.filter(|s| !s.is_empty())
 		.try_fold(0u128,|acc, s| {
 			let n: u32 = s.parse()?;
 			assert!(n < u128::BITS, "attempt to register scratchcard number over 128: {}", n);
@@ -72,7 +72,7 @@ impl AoCDay for Day04 {
 	type Data<'i> = Vec<ScratchCard>;
 	type Answer = usize;
 
-	fn day(&self) -> u8 { 04 }
+	fn day(&self) -> u8 { 4 }
 
 	fn parse<'i>(&self, input: &'i str) -> Self::Data<'i> {
 		aoch::parsing::from_lines(input).unwrap()

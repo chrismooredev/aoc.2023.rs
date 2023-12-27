@@ -62,9 +62,9 @@ impl IndexedMap {
 		log::info!("running with {} nodes for directions {}", current_nodes.len(), self.directions);
 
 		let mut steps = 1;
-		let mut dirs = std::iter::repeat(self.directions.as_str()).map(str::chars).flatten();
+		let dirs = std::iter::repeat(self.directions.as_str()).flat_map(str::chars);
 
-		while let Some(dir) = dirs.next() { // will never return None, but prevents an unwrap
+		for dir in dirs { // will never return None, but prevents an unwrap
 			log::trace!("step[{}] => current={:?}, found={:?}", steps, current_nodes, found_cycles);
 			current_nodes.retain_mut(|(start, curr)| {
 				// update current node
@@ -106,15 +106,14 @@ impl IndexedMap {
 				log::debug!("steps = {}M, found = {:?}, current = {:?}", steps/1_000_000, found_cycles, current_nodes);
 			}
 
-			if current_nodes.len() == 0 {
+			if current_nodes.is_empty() {
 				log::debug!("found = {:?}, current = {:?}", found_cycles, current_nodes);
 				break;
 			}
 		}
 
 		let lcm_steps: usize = found_cycles.iter()
-			.map(|(start, ends)| ends.iter().map(move |(end, steps)| (*start, *end, *steps)))
-			.flatten()
+			.flat_map(|(start, ends)| ends.iter().map(move |(end, steps)| (*start, *end, *steps)))
 			.inspect(|(start, end, steps)| log::debug!("{:?} --{}--> {:?}", start, steps, end))
 			.map(|(_start, _end, steps)| steps)
 			.fold(1, |acc, steps| num::Integer::lcm(&acc, &steps));
@@ -152,7 +151,7 @@ impl AoCDay for Day08 {
 	type Data<'i> = IndexedMap;
 	type Answer = usize;
 
-	fn day(&self) -> u8 { 08 }
+	fn day(&self) -> u8 { 8 }
 
 	fn parse<'i>(&self, input: &'i str) -> Self::Data<'i> {
 		let mut lines = input.lines()

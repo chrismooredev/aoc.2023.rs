@@ -50,7 +50,7 @@ impl FromStr for Play {
 		let (cards, bid) = s.trim().split_once(' ').unwrap();
 		let bid = bid.parse().unwrap();
 
-		let (_1, _2, _3, _4, _5) = cards.chars()
+		let (c1, c2, c3, c4, c5) = cards.chars()
 			.map(|c| match c {
 				'2'..='9' => FromPrimitive::from_u32((c as u32) - ('0' as u32)).unwrap(),
 				'T' => T,
@@ -62,7 +62,7 @@ impl FromStr for Play {
 			})
 			.collect_tuple().unwrap();
 
-		Ok(Play { cards: [_1, _2, _3, _4, _5], bid })
+		Ok(Play { cards: [c1, c2, c3, c4, c5], bid })
 	}
 }
 
@@ -91,13 +91,13 @@ impl Play {
 		}
 
 		match partitions.as_slice() {
-			&[(5, _)] => HandType::FiveOfAKind, // all five are eq
-			&[(4, _), (1, _)] => HandType::FourOfAKind,
-			&[(3, _), (2, _)] => HandType::FullHouse,
-			&[(3, _), (1, _), (1, _)] => HandType::ThreeOfAKind,
-			&[(2, _), (2, _), (1, _)] => HandType::TwoPair,
-			&[(2, _), (1, _), (1, _), (1, _)] => HandType::OnePair,
-			&[(1, _), (1, _), (1, _), (1, _), (1, _)] => HandType::HighCard,
+			[(5, _)] => HandType::FiveOfAKind, // all five are eq
+			[(4, _), (1, _)] => HandType::FourOfAKind,
+			[(3, _), (2, _)] => HandType::FullHouse,
+			[(3, _), (1, _), (1, _)] => HandType::ThreeOfAKind,
+			[(2, _), (2, _), (1, _)] => HandType::TwoPair,
+			[(2, _), (1, _), (1, _), (1, _)] => HandType::OnePair,
+			[(1, _), (1, _), (1, _), (1, _), (1, _)] => HandType::HighCard,
 			_ => panic!("unexpected hand partitions: {:?}", partitions),
 		}
 	}
@@ -127,7 +127,7 @@ impl AoCDay for Day07 {
 	type Data<'i> = Vec<Play>;
 	type Answer = usize;
 
-	fn day(&self) -> u8 { 07 }
+	fn day(&self) -> u8 { 7 }
 
 	fn parse<'i>(&self, input: &'i str) -> Self::Data<'i> {
 		aoch::parsing::from_lines(input).unwrap()

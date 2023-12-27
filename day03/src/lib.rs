@@ -58,7 +58,7 @@ impl AoCDay for Day03 {
 	type Data<'i> = GameBoard;
 	type Answer = usize;
 
-	fn day(&self) -> u8 { 03 }
+	fn day(&self) -> u8 { 3 }
 
 	fn parse<'i>(&self, input: &'i str) -> Self::Data<'i> {
 		assert!(input.is_ascii(), "input string not ascii");
@@ -73,7 +73,7 @@ impl AoCDay for Day03 {
 				|(mut line_lens, mut nums, mut syms, mut num_start), (row, raw)| {
 					raw.char_indices()
 						.for_each(|(col, c)| {
-							let digit = c.is_digit(10);
+							let digit = c.is_ascii_digit();
 							// eprintln!("{:?} => {:?}", (c, col, row), (digit, num_start));
 							match (digit, num_start) {
 								(true, None) => { // start a numebr
@@ -86,7 +86,7 @@ impl AoCDay for Day03 {
 									num_start = None;
 									assert!(numstr == raw, "same line string using different string for source number");
 									let txt = &numstr[nc..col];
-									let value = txt.parse::<usize>().expect(&format!("unable for parse string at ({:?}) as number : {:?}", (nc, nr), txt));
+									let value = txt.parse::<usize>().unwrap_or_else(|_| panic!("unable for parse string at ({:?}) as number : {:?}", (nc, nr), txt));
 									nums.push(PartNbr { value, row: nr, left: nc, right: Some(col-1) });
 									syms.push((c, col, row));
 								},

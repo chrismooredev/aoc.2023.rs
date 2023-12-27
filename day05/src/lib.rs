@@ -120,7 +120,7 @@ impl Layer {
 	}
 	fn check_overlapping(&mut self) -> bool {
 		self.ranges.sort_by_key(|m| m.src);
-		if self.ranges.len() == 0 { return false; }
+		if self.ranges.is_empty() { return false; }
 		let first_end = { let k = self.ranges[0]; k.src+k.len };
 		let (overlapping, _) = self.ranges.iter()
 			.skip(1)
@@ -378,7 +378,7 @@ impl AoCDay for Day05 {
 	type Data<'i> = Almanac;
 	type Answer = usize;
 
-	fn day(&self) -> u8 { 05 }
+	fn day(&self) -> u8 { 5 }
 
 	fn parse<'i>(&self, input: &'i str) -> Self::Data<'i> {
 		let mut lines = input.lines().filter_map(aoch::parsing::trimmed);
@@ -394,13 +394,13 @@ impl AoCDay for Day05 {
 
 		for l in lines {
 			if l.ends_with("map:") {
-				if group.2.len() > 0 {
+				if !group.2.is_empty() {
 					let (src, dst, maps) = group;
 					mappings.push(Layer { src_type: src, dst_type: dst, ranges: maps });
 					// mappings.insert((src, dst), maps);
 				}
 
-				let (raw_desc, _map) = l.split_once(" ").unwrap();
+				let (raw_desc, _map) = l.split_once(' ').unwrap();
 				let (src, _, dst) = raw_desc.split('-').collect_tuple().unwrap();
 				group = (src.to_owned(), dst.to_owned(), Vec::new());
 			} else {
@@ -411,7 +411,7 @@ impl AoCDay for Day05 {
 				group.2.push(Segment { dst, src, len })
 			}
 		}
-		if group.2.len() > 0 {
+		if !group.2.is_empty() {
 			let (src, dst, maps) = group;
 			mappings.push(Layer { src_type: src, dst_type: dst, ranges: maps });
 		}
@@ -420,7 +420,7 @@ impl AoCDay for Day05 {
 			.for_each(|m| {
 				let overlaps = m.check_overlapping();
 				log::debug!("Range {}-{} overlaps: {} ({} ranges)", m.src_type, m.dst_type, overlaps, m.ranges.len());
-				assert_eq!(overlaps, false, "range {}-{} overlaps", m.src_type, m.dst_type);
+				assert!(!overlaps, "range {}-{} overlaps", m.src_type, m.dst_type);
 			});
 
 		Almanac { seeds, mappings, cached: BTreeMap::default() }
@@ -447,7 +447,7 @@ impl AoCDay for Day05 {
 			.map_enum(|&[start, len]| start..start+len)
 			// .inspect(|(i, seed)| eprintln!("seed[{}, {:?}] starting search", i, seed))
 			.map_enum(|range| (range.clone(), _data.by_divisible_range(range)))
-			.map(|(si, (seed, derivations))| {
+			.flat_map(|(si, (seed, derivations))| {
 				derivations.into_iter()
 					.enumerate()
 					// .inspect(move |(path_idx, path)| eprintln!("seed[{}, {:?}][{}].raw = {:?}", si, sr1, path_idx, path))
@@ -457,7 +457,6 @@ impl AoCDay for Day05 {
 					// .inspect(move |(ii, s)| eprintln!("seed[{}, {:?}][{}] =-> {:?}", si, sr1.clone(), ii, s))
 					.map(move |(li, loc)| (si, seed.clone(), li, loc))
 			})
-			.flatten()
 			// .inspect(|(si, sr, li, lr)| eprintln!("seed[{}, {:?}][{}].result = {:?}", si, sr, li, lr))
 			.collect_vec();
 

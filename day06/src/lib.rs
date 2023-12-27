@@ -37,13 +37,13 @@ impl AoCDay for Day06 {
 	type Data<'i> = RaceResults;
 	type Answer = usize;
 
-	fn day(&self) -> u8 { 06 }
+	fn day(&self) -> u8 { 6 }
 
 	fn parse<'i>(&self, input: &'i str) -> Self::Data<'i> {
-		let (times, dists) = input.trim().split_once("\n").expect("not two lines");
+		let (times, dists) = input.trim().split_once('\n').expect("not two lines");
 
-		let itimes = times.split(" ").filter_map(aoch::parsing::trimmed);
-		let idists = dists.split(" ").filter_map(aoch::parsing::trimmed);
+		let itimes = times.split(' ').filter_map(aoch::parsing::trimmed);
+		let idists = dists.split(' ').filter_map(aoch::parsing::trimmed);
 
 		let separate = itimes.zip_eq(idists)
 			.skip(1) // row title

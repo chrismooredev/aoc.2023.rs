@@ -82,7 +82,7 @@ impl AoCDay for Day02 {
 	type Data<'i> = Vec<Game>;
 	type Answer = usize;
 
-	fn day(&self) -> u8 { 02 }
+	fn day(&self) -> u8 { 2 }
 
 	fn parse<'i>(&self, input: &'i str) -> Self::Data<'i> {
 		aoch::parsing::from_lines(input).unwrap()

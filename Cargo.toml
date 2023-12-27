@@ -1,13 +1,16 @@
 
+cargo-features = ["profile-rustflags"]
+
 [workspace]
 resolver = "2"
 members = ["day01", "day02", "day03", "day04", "day05", "day06", "day07", "day08"]
 
-[build]
-rustflags = ["-C", "target-cpu=native"]
-
 [profile.release]
 debug = true
+rustflags = ["-C", "target-cpu=native"]
+
+[profile.dev]
+rustflags = ["-C", "target-cpu=native"]
 
 [workspace.metadata.aoch]
 year = 2023

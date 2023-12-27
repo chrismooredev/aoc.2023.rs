@@ -18,7 +18,7 @@ impl FromStr for Game {
 	type Err = ();
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		let (raw_gid, raw_plays) = s.split_once(": ").unwrap();
-		let (pre, gid) = raw_gid.split_once(' ').unwrap();
+		let (_pre, gid) = raw_gid.split_once(' ').unwrap();
 		let id: usize = gid.parse().unwrap();
 
 		let plays = raw_plays.split("; ")

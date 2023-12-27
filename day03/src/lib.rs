@@ -79,7 +79,7 @@ impl AoCDay for Day03 {
 								(true, None) => { // start a numebr
 									num_start = Some((raw, col, row));
 								},
-								(true, Some((l, c, r))) => { // continue this number
+								(true, Some(_)) => { // continue this number
 
 								},
 								(false, Some((numstr, nc, nr))) if nr == row => { // finish this number

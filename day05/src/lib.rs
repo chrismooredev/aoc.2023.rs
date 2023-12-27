@@ -28,27 +28,17 @@ impl Almanac {
 	fn process(&self, seed: usize) -> AlmanacLookup<'_> {
 		AlmanacLookup::new(&self.mappings, seed)
 	}
-	fn lookup(&mut self, seed: usize) -> usize {
-		match self.cached.entry(seed) {
-			Entry::Occupied(e) => *e.get(),
-			Entry::Vacant(e) => {
-				let process = AlmanacLookup::new(&self.mappings, seed);
-				let (t, v) = process.last().unwrap();
-				assert_eq!(t, "location");
-				*e.insert(v)
-			}
-		}
-	}
 	fn by_divisible_range(&self, range: Range<usize>) -> Vec<Vec<(isize, Range<usize>)>> {
-		fn inner<F: FnMut(&[(isize, Range<usize>)])>(mappings: &[Layer], stack: &mut Vec<(isize, Range<usize>)>, search: (isize, Range<usize>), mut visit: &mut F) {
+		fn inner<F: FnMut(&[(isize, Range<usize>)])>(mappings: &[Layer], stack: &mut Vec<(isize, Range<usize>)>, search: (isize, Range<usize>), visit: &mut F) {
 			use Ordering::{Less, Equal, Greater};
 			let (last_offset, search) = search.clone();
-			let root_seed = stack.first().cloned().unwrap_or((last_offset, search.clone())).1;
 			let depthstr: String = (1..=stack.len()).map(|_| '\t').collect();
-			// eprintln!("seed[_, {root_seed:?}] {depthstr:}searching for match to {}[{search:?}]->{}",
-			// 	mappings.first().map(|s| s.src_type.as_str()).unwrap_or("location"),
-			// 	mappings.first().map(|s| s.dst_type.as_str()).unwrap_or("<end>"),
-			// );
+
+			let root_seed = stack.first().cloned().unwrap_or((last_offset, search.clone())).1;
+			log::debug!("seed[_, {root_seed:?}] {depthstr:}searching for match to {}[{search:?}]->{}",
+				mappings.first().map(|s| s.src_type.as_str()).unwrap_or("location"),
+				mappings.first().map(|s| s.dst_type.as_str()).unwrap_or("<end>"),
+			);
 
 			stack.push((last_offset, search.clone()));
 
@@ -65,60 +55,6 @@ impl Almanac {
 					for result in map.search_segments(search.clone()) {
 						inner(rest, stack, result, visit);
 					}
-
-					// let mut overlapping = false;
-
-					// for mr in map.ranges.iter() {
-					// 	let Range { start, end } = search.clone();
-
-					// 	let (ss, se) = (start, end); // exclusive
-					// 	let (rs, re) = (mr.src, mr.src+mr.len); // exclusive
-
-					// 	let overlaps = ss.max(rs) < se.min(re);
-
-					// 	let mut visit_ranges = |ranges: &[(bool, Range<usize>)]| {
-					// 		for (apply_offset, range) in ranges {
-					// 			let (offset, mapped) = match apply_offset {
-					// 				false => (0, range.clone()),
-					// 				true => (mr.offset(), mr.rangemap_opt(range.clone()).expect("rangemap returned None")),
-					// 			};
-					// 			eprintln!("seed[_, {root_seed:?}] {depthstr:} \\-> {:>9}[{range:?}]{:+} -> {}[{mapped:?}]",
-					// 				map.src_type, offset, map.dst_type
-					// 			);
-					// 			inner(rest, stack, (offset, mapped), visit);
-					// 		}
-					// 	};
-
-					// 	if !overlaps {
-					// 		eprintln!("seed[_, {root_seed:?}] {depthstr:}testing search {:?} against {}[{}] (overlaps = {})",
-					// 			search, map.src_type, mr, overlaps
-					// 		);
-					// 		// eprintln!("{depthstr:}testing {:?} with {:?}{diff:+} against search {search:?} (offset by {}, matches = {})", map.src_type, mr.range(), last_offset, overlaps);
-					// 		continue;
-					// 	}
-
-					// 	// eprintln!("{depthstr:}testing {:?} with {:?}{diff:+} against search {search:?} (offset by {}, matches = {}, order = {:?})", map.src_type, mr.range(), last_offset, overlaps, (ss.cmp(&rs), se.cmp(&(re))));
-					// 	let ordering = (ss.cmp(&rs), se.cmp(&(re)));
-					// 	eprintln!("seed[_, {root_seed:?}] {depthstr:}testing search {search:?} against {}[{}] (overlaps = {}, ordering = {:?})",
-					// 		map.src_type, mr, overlaps, ordering
-					// 	);
-					// 	overlapping = true;
-
-					// 	// do these properly check before/after ranges? using ss/se fully implies yes but...
-					// 	match ordering {
-					// 		(Equal | Greater, Greater) => visit_ranges(&[(true, ss..re), (false, re..se)]),
-					// 		(Greater | Equal, Equal | Less) => visit_ranges(&[(true, ss..se)]),
-					// 		(Less, Greater) => visit_ranges(&[(false, ss..rs), (true, rs..re), (false, re..se)]),
-					// 		(Less, Equal | Less) => visit_ranges(&[(false, ss..rs), (true, rs..se)]),
-					// 	}
-					// }
-
-					// if !overlapping {
-					// 	// not overlapping, passthrough
-					// 	eprintln!("seed[_, {root_seed:?}] {depthstr:}testing search {search:?} against {}[<none>:+0] (none overlap -- passing thru)", map.src_type);
-					// 	// eprintln!("{}testing {:?} (O={}, S={}): not overlapping, passing through {:?}", depthstr, (stack.len()), last_offset, map.src_type, search);
-					// 	inner(rest, stack, (0, search.clone()), visit);
-					// }
 				}
 			}
 
@@ -135,40 +71,6 @@ impl Almanac {
 		assert_eq!(scratch.len(), 0, "stack not emptied when done");
 		results
 	}
-	// fn by_divisible_range2(&self, search: Range<usize>) -> SegmentMapper {
-	// 	fn inner<Visit: FnMut(&[(isize, Range<usize>)])>() {
-
-	// 	}
-
-	// 	let mut scratch = Vec::with_capacity(self.mappings.len());
-	// 	let mut results = Vec::new();
-	// 	inner(&self.mappings)
-
-	// }
-	fn compile(&self) -> CompiledAlmanac {
-		const EXPECTED_START: &str = "seed";
-		const EXPECTED_END: &str = "location";
-
-		let mut mapiter = self.mappings.iter();
-		let mut map = mapiter.next().unwrap();
-		assert_eq!(map.src_type, EXPECTED_START);
-		loop {
-			match mapiter.next() {
-				Some(m) => {
-					assert_eq!(map.dst_type, m.src_type, "mappings were not in order");
-					map = m;
-				},
-				None => break,
-			}
-		}
-		assert_eq!(map.dst_type, EXPECTED_END, "compilation ended with {:?} instead of {:?}", map.dst_type, EXPECTED_END);
-
-		todo!()
-	}
-}
-
-struct CompiledAlmanac {
-	stages: Vec<Vec<(Range<usize>, isize)>>,
 }
 
 struct AlmanacLookup<'a> {
@@ -434,12 +336,6 @@ impl Segment {
 			_ => None
 		}
 	}
-	fn rangemap(&self, range: Range<usize>) -> (isize, Range<usize>) {
-		(self.offset(), Range {
-			start: range.start + self.dst - self.src,
-			end: range.end + self.dst - self.src,
-		})
-	}
 	fn range(&self) -> Range<usize> {
 		self.src..self.src+self.len
 	}
@@ -552,23 +448,21 @@ impl AoCDay for Day05 {
 			// .inspect(|(i, seed)| eprintln!("seed[{}, {:?}] starting search", i, seed))
 			.map_enum(|range| (range.clone(), _data.by_divisible_range(range)))
 			.map(|(si, (seed, derivations))| {
-				let sr1 = seed.clone();
-				let sr2 = seed;
 				derivations.into_iter()
 					.enumerate()
 					// .inspect(move |(path_idx, path)| eprintln!("seed[{}, {:?}][{}].raw = {:?}", si, sr1, path_idx, path))
-					.map_enum(|mut path| {
+					.map_enum(|path| {
 						path.last().unwrap().1.clone() // interested in the last location value
 					})
 					// .inspect(move |(ii, s)| eprintln!("seed[{}, {:?}][{}] =-> {:?}", si, sr1.clone(), ii, s))
-					.map(move |(li, loc)| (si, sr2.clone(), li, loc))
+					.map(move |(li, loc)| (si, seed.clone(), li, loc))
 			})
 			.flatten()
 			// .inspect(|(si, sr, li, lr)| eprintln!("seed[{}, {:?}][{}].result = {:?}", si, sr, li, lr))
 			.collect_vec();
 
 		let best = results.iter()
-			.min_by_key(|(si, sr, li, lr)| lr.start)
+			.min_by_key(|(_si, _sr, _li, lr)| lr.start)
 			.expect("no results found");
 
 		eprintln!("total of {} results found", results.len());

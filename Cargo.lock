@@ -506,6 +506,52 @@ dependencies = [
 ]
 
 [[package]]
+name = "day09"
+version = "0.1.0"
+dependencies = [
+ "aoch",
+ "itertools 0.10.5",
+ "log",
+ "test-log",
+ "thiserror",
+]
+
+[[package]]
+name = "day10"
+version = "0.1.0"
+dependencies = [
+ "aoch",
+ "arrayvec 0.7.4",
+ "itertools 0.10.5",
+ "log",
+ "termcolor",
+ "test-log",
+ "thiserror",
+]
+
+[[package]]
+name = "day11"
+version = "0.1.0"
+dependencies = [
+ "aoch",
+ "itertools 0.10.5",
+ "log",
+ "test-log",
+ "thiserror",
+]
+
+[[package]]
+name = "day12"
+version = "0.1.0"
+dependencies = [
+ "aoch",
+ "itertools 0.10.5",
+ "log",
+ "test-log",
+ "thiserror",
+]
+
+[[package]]
 name = "deranged"
 version = "0.3.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"

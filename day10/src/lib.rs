@@ -1,6 +1,8 @@
+#![feature(ascii_char)]
+
 #![allow(unused_imports)]
 use std::collections::hash_map::Entry;
-use std::{str::FromStr, collections::HashMap};
+use std::str::FromStr;
 use std::fmt::Debug;
 use arrayvec::ArrayVec;
 use itertools::Itertools;
@@ -11,6 +13,9 @@ use aoch::{DayPart, run_test, test_runner, daystr};
 
 use std::io::Write;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
+
+// BTreeMap does not make it significantly better
+type HashMap<K, V> = std::collections::HashMap<K, V>;
 
 type UCOORD = usize;
 type SCOORD = isize;
@@ -76,7 +81,7 @@ fn line_seeker() {
 	assert_eq!(seeker.back(), None);
 }
 
-#[derive(Debug,Clone,Copy,PartialEq,Eq,Hash)]
+#[derive(Debug,Clone,Copy,PartialEq,Eq,PartialOrd,Ord,Hash)]
 enum LineSide {
 	Left,
 	Right
@@ -181,11 +186,11 @@ impl std::ops::Add<Direction> for (UCOORD, UCOORD) {
 }
 
 #[derive(Debug,Clone)]
-pub struct Maze<'s>(&'s str, Vec<&'s str>);
+pub struct Maze<'s>(&'s [std::ascii::Char], usize);
 
 impl<'s> Maze<'s> {
 	fn get(&self, x: UCOORD, y: UCOORD) -> Option<char> {
-		self.1.get(y as usize).map(|l| l.chars().nth(x as usize)).flatten()
+		self.0.get((y as usize)*(self.1) + (x as usize)).map(|c| c.to_char())
 	}
 
 	fn get_around(&self, x: UCOORD, y: UCOORD, dir: Direction) -> Option<((UCOORD, UCOORD), char)> {
@@ -224,42 +229,12 @@ impl<'s> Maze<'s> {
 					.filter(|d| *d != to_center)
 					.map(|d| ((nx, ny), ndir, d))
 					.next()
-
-				// one direction goes back towards (x, y)
-				// the other doesn't go backwards towards (x, y)
-
-				// need to assert one conditions:
-				// - connects to (x, y)
-
-				// Direction::symbol_connections(nc).iter()
-				// 	.flatten()
-				// 	.copied()
-				// 	.inspect(|d| eprintln!("\tsymbol connection: {:?} / {:?}", (nx, ny), d))
-				// 	.filter(|d| ndir != d.opposite()) // points back towards the target
-				// 	.inspect(|d| eprintln!("\t\tyielded!"))
-				// 	.map(|d| ((nx, ny), ndir, d))
-				// 	.next()
-
-					// .inspect(|[d1, d2]| eprintln!("\tvisiting "))
-					// .and_then(|[d1, d2]| {
-					// 	if towards_self == d1 {
-					// 		Some(((nx, ny), d1))
-					// 	} else if towards_self == d2 {
-					// 		Some(((nx, ny), d2))
-					// 	} else {
-					// 		None
-					// 	}
-					// })
 			})
 	}
 	fn find_start(&self) -> Option<(UCOORD, UCOORD)> {
-		self.0.lines()
-			.enumerate()
-			.flat_map(|(li, line)| {
-				line.match_indices('S').next()
-					.map(|(ci, _s)| (ci as UCOORD, li as UCOORD))
-			})
-			.next()
+		self.0.iter()
+			.position(|c| c.to_char() == 'S')
+			.map(|i| ((i % self.1) as UCOORD, (i/self.1) as UCOORD))
 	}
 	fn walk_path(&self) -> impl Iterator<Item = ((UCOORD, UCOORD), Direction, char)> + '_ {
 		let start = self.find_start().expect("cannot walk a path with no start");
@@ -331,9 +306,21 @@ impl AoCDay for Day10 {
 
 	fn parse<'i>(&self, input: &'i str) -> Self::Data<'i> {
 		let raw = input.trim();
-		let mut lines = Vec::with_capacity(raw.lines().count());
-		lines.extend(raw.lines().filter_map(aoch::parsing::trimmed));
-		Maze(raw, lines)
+		// eprintln!("Debug:\n{:?}", raw);
+		// eprintln!("Display:\n{}", raw);
+		let ascii = raw.as_ascii().expect("input not ascii");
+		let width_eqs = raw.lines()
+			.map(|l| l.len())
+			// .enumerate()
+			// .inspect(|(i, len)| eprintln!("Line {}: {}", i, len))
+			// .map(|(_i, len)| len)
+			.all_equal();
+		if ! width_eqs {
+			panic!("not all input lines are of equal length");
+		}
+		let width = raw.lines().map(|l| l.len()+1).next();
+
+		Maze(ascii, width.expect("no input lines"))
 	}
 	fn part1(&self, _data: &mut Self::Data<'_>) -> Self::Answer {
 		use Direction::{North, East, South, West};
@@ -345,7 +332,7 @@ impl AoCDay for Day10 {
 		let path_ordered = _data.walk_path()
 			// .inspect(|t| eprintln!("path node: {:?}", t))
 			.collect_vec();
-		let mut path: HashMap<(UCOORD, UCOORD), (Direction, char)> = path_ordered.iter()
+		let path: HashMap<(UCOORD, UCOORD), (Direction, char)> = path_ordered.iter()
 			.map(|&(xy, d, c)| (xy, (d, c)))
 			.collect();
 

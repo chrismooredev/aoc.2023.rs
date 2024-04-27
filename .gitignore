@@ -3,3 +3,6 @@
 /input
 **/*.rs.bk
 *.pdb
+
+day*/*.exe
+day*/*.svg
